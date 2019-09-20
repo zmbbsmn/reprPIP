@@ -44,10 +44,15 @@ class OHLCPoint:
 
 class ExtremePoint:
 
-    def __init__(self, ohlc: OHLCPoint, direction: Direction, move_since: float = None):
+    def __init__(self,
+                 ohlc: OHLCPoint, 
+                 direction: Direction, 
+                 vertical_move_since: float = None,
+                 horizontal_move_since: float = None):
         self.__ohlc = ohlc
         self.__direction = direction
-        self.__move_since = move_since
+        self.__vertical_move_since = vertical_move_since
+        self.__horizontal_move_since = horizontal_move_since
 
     @property
     def ohlc(self):
@@ -62,8 +67,23 @@ class ExtremePoint:
         return self.__ohlc.instant
 
     @property
-    def move_since_last_extreme(self):
-        return self.__move_since
+    def vertical_move_since_last_extreme(self):
+        return self.__vertical_move_since
+
+    @property
+    def horizontal_move_since_last_extreme(self):
+        return self.__horizontal_move_since
+
+    def __str__(self):
+        if self.__direction == Direction.Up:
+            str_direction = '⬈'
+        else:
+            str_direction = '︎︎︎⬊'
+
+        str_vert_move = '*[{0},{0}]'.format(self.__vertical_move_since)
+        str_hori_move = '~[{0},{0}]'.format(self.__horizontal_move_since)
+
+        return str_direction + str_vert_move + str_hori_move
 
 
 class PIPState:

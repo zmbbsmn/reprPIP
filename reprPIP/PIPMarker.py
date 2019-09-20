@@ -13,11 +13,12 @@ class PIPMarker:
         units_moved: float = 0.
         if self.__state.is_null_state:
             # give a default state
+            start_as_extrme = ExtremePoint(ohlc, Direction.Up, units_moved, 0)
             self.__state = PIPState(
-                latest_unlocked=ExtremePoint(ohlc, Direction.Up, units_moved),
-                latest_locked=None
+                latest_unlocked = start_as_extrme,
+                latest_locked = start_as_extrme
             )
-            self.__locked_extreme_list.append(ExtremePoint(ohlc, Direction.Up, units_moved))
+            self.__locked_extreme_list.append(ExtremePoint(ohlc, Direction.Up, units_moved, 0))
         else:
             unlocked = self.__state.latest_unlocked
             locked = self.__state.latest_locked
@@ -27,14 +28,20 @@ class PIPMarker:
                 if units_moved <= -1: # flipped
                     self.__locked_extreme_list.append(unlocked)
                     self.__state = PIPState(
-                        latest_unlocked = ExtremePoint(ohlc, Direction.Down, units_moved),
+                        latest_unlocked = ExtremePoint(ohlc, 
+                                                       Direction.Down, 
+                                                       units_moved, 
+                                                       (ohlc.instant - unlocked.instant).total_seconds()),
                         latest_locked = self.__state.latest_unlocked
                     )
                 elif -1 < units_moved < 0: # going down but not flipped
                     pass
                 else: # continue going up
                     self.__state = PIPState(
-                        latest_unlocked = ExtremePoint(ohlc, Direction.Up, units_moved),
+                        latest_unlocked = ExtremePoint(ohlc, 
+                                                       Direction.Up, 
+                                                       units_moved,
+                                                       (ohlc.instant - locked.instant).total_seconds()),
                         latest_locked = self.__state.latest_locked
                     )
             else: # Direction.Down
@@ -42,14 +49,20 @@ class PIPMarker:
                 if units_moved >= 1: # flipped
                     self.__locked_extreme_list.append(unlocked)
                     self.__state = PIPState(
-                        latest_unlocked = ExtremePoint(ohlc, Direction.Up, units_moved),
+                        latest_unlocked = ExtremePoint(ohlc, 
+                                                       Direction.Up, 
+                                                       units_moved,
+                                                       (ohlc.instant - unlocked.instant).total_seconds()),
                         latest_locked = self.__state.latest_unlocked
                     )
                 elif 0 < units_moved < 1: # going up but not flipped
                     pass
                 else: # continue going down
                     self.__state = PIPState(
-                        latest_unlocked = ExtremePoint(ohlc, Direction.Down, units_moved),
+                        latest_unlocked = ExtremePoint(ohlc, 
+                                                       Direction.Down, 
+                                                       units_moved,
+                                                       ohlc.instant - locked.instant.total_seconds()),
                         latest_locked = self.__state.latest_locked
                     )
         return units_moved
