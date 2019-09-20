@@ -101,9 +101,14 @@ class ExtremePoint:
 
 class PIPState:
 
-    def __init__(self, latest_unlocked: ExtremePoint = None, latest_locked: ExtremePoint = None):
+    def __init__(self,
+                 latest_unlocked: ExtremePoint = None, 
+                 latest_locked: ExtremePoint = None, 
+                 units_moved_on_direction: float = None):
+        
         self.__latest_unlocked = latest_unlocked
         self.__latest_locked = latest_locked
+        self.__move_on_direction = units_moved_on_direction
 
     @property
     def latest_unlocked(self):
@@ -124,5 +129,13 @@ class PIPState:
     @property
     def is_null_state(self):
         return self.__latest_unlocked is None and self.__latest_locked is None
+
+    @property
+    def units_moved_on_direction(self):
+        return self.__move_on_direction 
+
+    @units_moved_on_direction.setter
+    def units_moved_on_direction(self, units: float):
+        self.__move_on_direction = units
 
     

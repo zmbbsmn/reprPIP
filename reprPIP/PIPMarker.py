@@ -34,7 +34,7 @@ class PIPMarker:
                                                 Direction.Down, 
                                                 units_moved_from_unlocked, 
                                                 (ohlc.instant - new_locked.instant).total_seconds())
-                    new_state = PIPState(new_unlocked, new_locked)
+                    new_state = PIPState(new_unlocked, new_locked, units_moved_from_unlocked)
 
                     self.__locked_extreme_list.append(new_locked)
                     self.__state = new_state
@@ -46,7 +46,7 @@ class PIPMarker:
                                                 Direction.Up, 
                                                 units_moved_from_locked,
                                                 (ohlc.instant - locked.instant).total_seconds())
-                    new_state = PIPState(new_unlocked, locked)
+                    new_state = PIPState(new_unlocked, locked, units_moved_from_locked)
                     self.__state = new_state
             else: # Direction.Down
                 units_moved_from_unlocked = (ohlc.h - unlocked.extreme_value)/self.__umd
@@ -56,7 +56,7 @@ class PIPMarker:
                                                 Direction.Up, 
                                                 units_moved_from_unlocked,
                                                 (ohlc.instant - unlocked.instant).total_seconds())
-                    new_state = PIPState(new_unlocked, new_locked)
+                    new_state = PIPState(new_unlocked, new_locked, units_moved_from_unlocked)
                     self.__locked_extreme_list.append(new_locked)
                     self.__state = new_state
                 elif 0 < units_moved_from_unlocked < 1: # going up but not flipped
@@ -67,9 +67,9 @@ class PIPMarker:
                                                 Direction.Down, 
                                                 units_moved_from_locked,
                                                 (ohlc.instant - locked.instant).total_seconds())
-                    new_state = PIPState(new_unlocked, locked)
+                    new_state = PIPState(new_unlocked, locked, units_moved_from_locked)
                     self.__state = new_state
-        return units_moved_from_unlocked
+        return self.__state.units_moved_on_direction
 
     def walk_through(self, path: list):
         assert all([type(point)==OHLCPoint for point in path])
