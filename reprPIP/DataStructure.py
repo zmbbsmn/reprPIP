@@ -1,15 +1,38 @@
 from enum import IntEnum
 from datetime import datetime
+from typeguard import typechecked
+from typing import NoReturn, TypeVar, NoReturn, Optional, List
 
 
-class Direction:
+class Instant:
+
+    @typechecked
+    def __init__(self, instant: TypeVar('Instant', datetime, int)):
+        self.__instant = instant
+
+    @typechecked
+    def __sub__(self, other: "Instant") -> float:
+        if isinstance(self.instant, datetime) and isinstance(other.instant, datetime):
+            return (self.instant - other.instant).total_seconds()
+        elif isinstance(self.instant, int) and isinstance(other.instant, int):
+            return self.instant - other.instant
+        else:
+            raise TypeError('TypeError in minus op of Instant')
+
+    @property
+    def instant(self):
+        return self.__instant
+
+
+class Direction(IntEnum):
     Up = 1
     Down = -1
 
 
 class OHLCPoint:
 
-    def __init__(self, instant: datetime, o: float, h: float, l: float, c: float):
+    @typechecked
+    def __init__(self, instant: Instant, o: float, h: float, l: float, c: float):
         self.__instant = instant
         self.__o = o
         self.__h = h
@@ -36,19 +59,21 @@ class OHLCPoint:
     def instant(self):
         return self.__instant
 
-    @staticmethod
-    def create_singleton(instant: datetime, value: float):
+    @staticmethod 
+    @typechecked
+    def create_singleton(instant: Instant, value: float) -> "OHLCPoint":
         singleton = OHLCPoint(instant, value, value, value, value)
         return singleton
 
 
 class ExtremePoint:
 
+    @typechecked
     def __init__(self,
                  ohlc: OHLCPoint, 
                  direction: Direction, 
-                 vertical_move_since: float = None,
-                 horizontal_move_since: float = None,
+                 vertical_move_since: Optional[float] = None,
+                 horizontal_move_since: Optional[float] = None,
                  is_terminal: bool = False):
         self.__ohlc = ohlc
         self.__direction = direction
@@ -93,18 +118,19 @@ class ExtremePoint:
             else:
                 str_direction = '︎︎︎⬊'
 
-            str_vert_move = '*[{0},{0}]'.format(self.__vertical_move_since)
-            str_hori_move = '~[{0},{0}]'.format(self.__horizontal_move_since)
+            str_vert_move = '*{0}'.format(self.__vertical_move_since)
+            str_hori_move = '~{0}'.format(self.__horizontal_move_since)
 
             return str_direction + str_vert_move + str_hori_move
 
 
 class PIPState:
 
+    @typechecked
     def __init__(self,
-                 latest_unlocked: ExtremePoint = None, 
-                 latest_locked: ExtremePoint = None, 
-                 units_moved_on_direction: float = None):
+                 latest_unlocked: Optional[ExtremePoint] = None, 
+                 latest_locked: Optional[ExtremePoint] = None, 
+                 units_moved_on_direction: Optional[float] = None):
         
         self.__latest_unlocked = latest_unlocked
         self.__latest_locked = latest_locked
