@@ -23,6 +23,9 @@ class Instant:
     def instant(self):
         return self.__instant
 
+    def __repr__(self):
+        return str(self.instant)
+
 
 class Direction(IntEnum):
     Up = 1
@@ -38,6 +41,15 @@ class OHLCPoint:
         self.__h = h
         self.__l = l
         self.__c = c
+
+    def __repr__(self):
+        return 'OHLCPoint(instant:{0}, o:{1}, h:{2}, l:{3}, c:{4})'.format(
+            repr(self.__instant),
+            repr(self.__o),
+            repr(self.__h),
+            repr(self.__l),
+            repr(self.__c)
+        )
 
     @property
     def o(self):
@@ -80,6 +92,9 @@ class ExtremePoint:
         self.__vertical_move_since = vertical_move_since
         self.__horizontal_move_since = horizontal_move_since
         self.__is_terminal = is_terminal
+
+    def __repr__(self):
+        return repr(self.__ohlc)
 
     @property
     def ohlc(self):
