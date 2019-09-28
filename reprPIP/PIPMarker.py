@@ -74,10 +74,12 @@ class PIPMarker:
         return self.__state.units_moved_on_direction
 
     @typechecked
-    def walk_through(self, path: List[OHLCPoint]):
+    def walk_through(self, path: List[OHLCPoint], skip: Optional[int] = None):
+
+        path_to_walk = path if skip is None else path[min(skip, len(path)):]
         path_ranges = [(point.instant, self.__calculate(point)) 
-                        for point in path]
+                        for point in path_to_walk]
 
-        pips = self.__locked_extreme_list + [self.__state.latest_unlocked]
+        pips_to_show = self.__locked_extreme_list + [self.__state.latest_unlocked]
 
-        return pips, path_ranges
+        return pips_to_show, path_ranges
