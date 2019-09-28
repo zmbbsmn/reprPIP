@@ -3,11 +3,13 @@ from .DataStructure import *
 
 class PIPMarker:
 
+    @typechecked
     def __init__(self, unit_move_distance: float):
         self.__umd = unit_move_distance
         self.__state = PIPState()
         self.__locked_extreme_list = []
 
+    @typechecked
     def __calculate(self, ohlc: OHLCPoint):
 
         units_moved_from_unlocked: float = 0.
@@ -33,7 +35,7 @@ class PIPMarker:
                     new_unlocked = ExtremePoint(ohlc, 
                                                 Direction.Down, 
                                                 units_moved_from_unlocked, 
-                                                (ohlc.instant - new_locked.instant).total_seconds())
+                                                (ohlc.instant - new_locked.instant))
                     new_state = PIPState(new_unlocked, new_locked, units_moved_from_unlocked)
 
                     self.__locked_extreme_list.append(new_locked)
@@ -45,7 +47,7 @@ class PIPMarker:
                     new_unlocked = ExtremePoint(ohlc, 
                                                 Direction.Up, 
                                                 units_moved_from_locked,
-                                                (ohlc.instant - locked.instant).total_seconds())
+                                                (ohlc.instant - locked.instant))
                     new_state = PIPState(new_unlocked, locked, units_moved_from_locked)
                     self.__state = new_state
             else: # Direction.Down
@@ -55,7 +57,7 @@ class PIPMarker:
                     new_unlocked = ExtremePoint(ohlc, 
                                                 Direction.Up, 
                                                 units_moved_from_unlocked,
-                                                (ohlc.instant - unlocked.instant).total_seconds())
+                                                (ohlc.instant - unlocked.instant))
                     new_state = PIPState(new_unlocked, new_locked, units_moved_from_unlocked)
                     self.__locked_extreme_list.append(new_locked)
                     self.__state = new_state
@@ -66,13 +68,13 @@ class PIPMarker:
                     new_unlocked = ExtremePoint(ohlc, 
                                                 Direction.Down, 
                                                 units_moved_from_locked,
-                                                (ohlc.instant - locked.instant).total_seconds())
+                                                (ohlc.instant - locked.instant))
                     new_state = PIPState(new_unlocked, locked, units_moved_from_locked)
                     self.__state = new_state
         return self.__state.units_moved_on_direction
 
-    def walk_through(self, path: list):
-        assert all([type(point)==OHLCPoint for point in path])
+    @typechecked
+    def walk_through(self, path: List[OHLCPoint]):
         path_ranges = [(point.instant, self.__calculate(point)) 
                         for point in path]
 
